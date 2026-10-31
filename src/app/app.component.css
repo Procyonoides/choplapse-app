@@ -61,3 +61,119 @@ input[type=file] { width: 100%; font-size: 13px; color: var(--text); }
 progress { width: 100%; height: 10px; margin-bottom: 12px; }
 video { width: 100%; max-height: 70vh; border-radius: 8px; background: #000; }
 .dl { display: inline-block; margin-top: 10px; color: var(--accent); font-weight: 600; }
+
+/* ===== Header ===== */
+.hero { margin-bottom: 20px; animation: fadeUp .6s ease both; }
+h1 {
+  font-size: 34px;
+  width: fit-content;
+  background: linear-gradient(90deg, var(--accent), #ff6ec7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ===== Kartu: muncul satu-satu + hover ===== */
+.card {
+  animation: fadeUp .5s ease both;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.layout > div > .card:nth-child(2) { animation-delay: .08s; }
+.layout > div > .card:nth-child(3) { animation-delay: .16s; }
+.layout > div > .card:nth-child(4) { animation-delay: .24s; }
+.layout > div:first-child .card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(108, 76, 241, .18);
+}
+
+/* ===== Tombol proses ===== */
+.btn {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, var(--accent), #ff6ec7);
+  transition: transform .15s ease, box-shadow .2s ease;
+}
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(108, 76, 241, .4);
+}
+.btn:active:not(:disabled) { transform: scale(.98); }
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -60%;
+  width: 40%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .35), transparent);
+  transform: skewX(-20deg);
+}
+.btn:hover:not(:disabled)::after { animation: shimmer .8s ease; }
+
+/* ===== Progress bar ===== */
+progress {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  border-radius: 99px;
+  overflow: hidden;
+  background: var(--border);
+}
+progress::-webkit-progress-bar { background: var(--border); border-radius: 99px; }
+progress::-webkit-progress-value {
+  background: linear-gradient(90deg, var(--accent), #ff6ec7);
+  border-radius: 99px;
+  transition: width .3s ease;
+}
+progress::-moz-progress-bar {
+  background: linear-gradient(90deg, var(--accent), #ff6ec7);
+  border-radius: 99px;
+}
+
+/* ===== Spinner ===== */
+.spinner {
+  display: inline-block;
+  width: 12px; height: 12px;
+  margin-right: 6px;
+  vertical-align: -1px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+/* ===== Video muncul ===== */
+video { animation: pop .4s ease both; }
+
+/* ===== Tombol download ===== */
+.btn-download {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .2s ease, color .2s ease, transform .15s ease;
+}
+.btn-download:hover { background: var(--accent); color: #fff; transform: translateY(-2px); }
+.btn-download:active { transform: scale(.98); }
+
+/* ===== Keyframes ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pop {
+  from { opacity: 0; transform: scale(.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shimmer { to { left: 130%; } }
+
+/* Hormati pengguna yang matiin animasi di sistem */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
