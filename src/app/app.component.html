@@ -1,58 +1,90 @@
 <h1>ChopLapse</h1>
-<p>{{ status() }}</p>
+<p class="sub">Auto-cut timelapse patah-patah buat konten menggambar</p>
 
-<input type="file" accept="video/*" (change)="onFileSelected($event)">
-<p>{{ fileInfo() }}</p>
+<div class="layout">
+  <div>
+    <section class="card">
+      <h3>1. Video</h3>
+      <input type="file" accept="video/*" (change)="onFileSelected($event)">
+      <p class="info">{{ fileInfo() }}</p>
+    </section>
 
-@if (previewUrl()) {
-  <video [src]="previewUrl()" controls width="360" (loadedmetadata)="onMetadata($event)"></video>
-}
+    <section class="card">
+      <h3>2. Potongan</h3>
+      <div class="row">
+        <label class="field">Interval (detik)
+          <input type="number" [(ngModel)]="interval" min="0.5" step="0.5">
+        </label>
+        <label class="field">Panjang potongan (detik)
+          <input type="number" [(ngModel)]="clipLen" min="0.1" step="0.1">
+        </label>
+      </div>
+      <label class="field">Target durasi (detik, opsional)
+        <input type="number" [(ngModel)]="target" min="1" step="1" placeholder="kosongin = manual">
+      </label>
+    </section>
 
-<div>
-  <label>Interval (detik): <input type="number" [(ngModel)]="interval" min="0.5" step="0.5"></label>
-  <label>Panjang potongan (detik): <input type="number" [(ngModel)]="clipLen" min="0.1" step="0.1"></label>
-  <label>Target durasi (detik, opsional): <input type="number" [(ngModel)]="target" min="1" step="1" placeholder="kosongin = manual"></label>
-  <label>Mode rasio:
-    <select [(ngModel)]="mode">
-      <option value="fit">Fit 9:16 (ada hitam)</option>
-      <option value="crop">Crop 9:16 (penuh)</option>
-      <option value="crop34">Crop 3:4 di dalam 9:16</option>
-      <option value="crop43">Crop 4:3 di dalam 9:16</option>
-      <option value="original">Asli (tanpa ubah)</option>
-    </select>
-  </label>
-  <label>Background:
-    <select [(ngModel)]="bg">
-      <option value="blur">Blur</option>
-      <option value="video">Video (tanpa blur)</option>
-      <option value="dark">Gelap</option>
-    </select>
-  </label>
-  @if (bg === 'blur') {
-    <label>Kekuatan blur: {{ blur }}
-      <input type="range" [(ngModel)]="blur" min="1" max="30">
-    </label>
-  }
-  <label>Musik latar (opsional):
-    <input type="file" accept="audio/*" (change)="onMusicSelected($event)">
-  </label>
-  <label>Watermark (kosongin = tanpa):
-    <input type="text" [(ngModel)]="wmText" placeholder="@akunkamu">
-  </label>
-  <label>Posisi:
-    <select [(ngModel)]="wmPos">
-      <option value="bottom">Bawah</option>
-      <option value="middle">Tengah</option>
-      <option value="top">Atas</option>
-    </select>
-  </label>
-  <button (click)="startChop()" [disabled]="processing()">Mulai Chop</button>
+    <section class="card">
+      <h3>3. Tampilan</h3>
+      <label class="field">Mode rasio
+        <select [(ngModel)]="mode">
+          <option value="fit">Fit 9:16 (ada hitam)</option>
+          <option value="crop">Crop 9:16 (penuh)</option>
+          <option value="crop34">Crop 3:4 di dalam 9:16</option>
+          <option value="crop43">Crop 4:3 di dalam 9:16</option>
+          <option value="original">Asli (tanpa ubah)</option>
+        </select>
+      </label>
+      <label class="field">Background
+        <select [(ngModel)]="bg">
+          <option value="blur">Blur</option>
+          <option value="video">Video (tanpa blur)</option>
+          <option value="dark">Gelap</option>
+        </select>
+      </label>
+      @if (bg === 'blur') {
+        <label class="field">Kekuatan blur: {{ blur }}
+          <input type="range" [(ngModel)]="blur" min="1" max="30">
+        </label>
+      }
+    </section>
+
+    <section class="card">
+      <h3>4. Tambahan</h3>
+      <label class="field">Musik latar (opsional)
+        <input type="file" accept="audio/*" (change)="onMusicSelected($event)">
+      </label>
+      <label class="field">Watermark (kosongin = tanpa)
+        <input type="text" [(ngModel)]="wmText" placeholder="@akunkamu">
+      </label>
+      <label class="field">Posisi watermark
+        <select [(ngModel)]="wmPos">
+          <option value="bottom">Bawah</option>
+          <option value="middle">Tengah</option>
+          <option value="top">Atas</option>
+        </select>
+      </label>
+    </section>
+
+    <button class="btn" (click)="startChop()" [disabled]="processing()">Mulai Chop</button>
+  </div>
+
+  <div>
+    @if (previewUrl()) {
+      <section class="card">
+        <h3>Video asli</h3>
+        <video [src]="previewUrl()" controls (loadedmetadata)="onMetadata($event)"></video>
+      </section>
+    }
+
+    <section class="card">
+      <h3>Hasil</h3>
+      <p class="status">{{ status() }}</p>
+      <progress [value]="progress()" max="100"></progress>
+      @if (resultUrl()) {
+        <video [src]="resultUrl()" controls></video>
+        <a class="dl" [href]="resultUrl()" download="choplapse-hasil.mp4">Download hasil</a>
+      }
+    </section>
+  </div>
 </div>
-
-<progress [value]="progress()" max="100"></progress>
-
-@if (resultUrl()) {
-  <h3>Hasil</h3>
-  <video [src]="resultUrl()" controls width="360"></video>
-  <p><a [href]="resultUrl()" download="choplapse-hasil.mp4">Download hasil</a></p>
-}
