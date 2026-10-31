@@ -9,6 +9,8 @@ export interface ChopOptions {
   blur: number;
   wmText: string;
   wmPos: string;
+  music: File | null;
+  duration: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -43,7 +45,7 @@ export class FfmpegService {
     try {
       await this.ffmpeg.writeFile('input.mp4', new Uint8Array(await file.arrayBuffer()));
 
-      const { interval, clipLen, mode, bg, blur, wmText, wmPos } = opts;
+      const { interval, clipLen, mode, bg, blur, wmText, wmPos, music, duration } = opts;
       const base = `fps=30,select='lt(mod(t,${interval}),${clipLen})',setpts=N/(30*TB)`;
       let filter = base;
 
@@ -84,7 +86,7 @@ export class FfmpegService {
 
       filter += wm;
 
-      let videoArgs: string[] = ['-vf', filter];
+      let videoArgs: string[] = ['-vf', filter, '-map', '0:v'];
 
       if (bg !== 'dark' && fgFilters[mode]) {
         const bgChain = bg === 'blur'
@@ -100,10 +102,33 @@ export class FfmpegService {
         videoArgs = ['-filter_complex', complex, '-map', '[v]'];
       }
 
+      let audioInputs: string[] = [];
+      let audioArgs: string[] = ['-an'];
+
+      if (music) {
+        await this.ffmpeg.writeFile('music.mp3', new Uint8Array(await music.arrayBuffer()));
+
+        const fullClips = Math.floor(duration / interval);
+        const sisa = duration - fullClips * interval;
+        const outDur = fullClips * clipLen + Math.min(sisa, clipLen);
+        const fade = Math.min(1.5, outDur / 2);
+        const fadeStart = Math.max(0, outDur - fade);
+
+        audioInputs = ['-i', 'music.mp3'];
+        audioArgs = [
+          '-map', '1:a',
+          '-af', `afade=t=in:d=0.5,afade=t=out:st=${fadeStart}:d=${fade}`,
+          '-c:a', 'aac',
+          '-b:a', '192k',
+          '-shortest',
+        ];
+      }
+
       await this.ffmpeg.exec([
         '-i', 'input.mp4',
+        ...audioInputs,
         ...videoArgs,
-        '-an',
+        ...audioArgs,
         '-c:v', 'libx264',
         '-preset', 'ultrafast',
         '-pix_fmt', 'yuv420p',

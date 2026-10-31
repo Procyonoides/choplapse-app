@@ -27,6 +27,12 @@ export class AppComponent implements OnInit {
   blur = 10;
   wmText = '';
   wmPos = 'bottom';
+  musicFile: File | null = null;
+
+  onMusicSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.musicFile = input.files?.[0] ?? null;
+  }
 
   processing = signal(false);
   progress = signal(0);
@@ -62,6 +68,7 @@ export class AppComponent implements OnInit {
           interval, clipLen,
           mode: this.mode, bg: this.bg, blur: this.blur,
           wmText: this.wmText, wmPos: this.wmPos,
+          music: this.musicFile, duration: this.duration(),
         },
         (persen) => {
           this.progress.set(persen);
