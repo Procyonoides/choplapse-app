@@ -55,6 +55,11 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "prebundle": {
+              "exclude": ["@ffmpeg/ffmpeg", "@ffmpeg/util"]
+            }
+          },
           "configurations": {
             "production": {
               "buildTarget": "choplapse-app:build:production"
@@ -91,5 +96,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "2999740d-7a40-4a93-8664-b5b86aeb8fc8"
   }
 }
